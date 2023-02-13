@@ -20,11 +20,14 @@ test = [
     "pytest",
 ]
 dev = [
-    "Визуализация датасета[test]",
+    "dataset_viewer[test]",
     "flake8",
     "mypy",
     "pre-commit",
 ]
+
+[project.scripts]
+view_dataset = "dataset_viewer.cli:main"
 
 [tool.setuptools.packages.find]
 exclude = ["test"]
