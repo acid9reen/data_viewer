@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier
+_commit: bdad037
+_src_path: gh:acid9reen/python_template
+author: Руслан Смирнов
+package_name: dataset_viewer
+project_name: Визуализация датасета
+project_short_description: Скрипт для просмотра датасета на наличие нерелевантных
+    данных
+python_version: '3.10'

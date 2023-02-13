@@ -1,0 +1,30 @@
+[build-system]
+# Minimum requirements for the build system to execute.
+requires = ["setuptools", "wheel"]  # PEP 508 specifications.
+
+[project]
+name = "dataset_viewer"
+authors = [
+    {name = "Руслан Смирнов"},
+]
+description = "Скрипт для просмотра датасета на наличие нерелевантных данных"
+readme = "README.md"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "fiftyone",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+dev = [
+    "Визуализация датасета[test]",
+    "flake8",
+    "mypy",
+    "pre-commit",
+]
+
+[tool.setuptools.packages.find]
+exclude = ["test"]
