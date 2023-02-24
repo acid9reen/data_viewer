@@ -48,39 +48,31 @@ def main() -> int:
 
             for row in csv_reader:
                 image_path, *__ = row
-                sample = fo.Sample(filepath=str(args.dataset_file.parent / image_path))
+                path = args.dataset_file.parent / image_path
+                sample = fo.Sample(filepath=path.as_posix())
                 samples.append(sample)
     else:
         with open(args.dataset_file, 'r', newline='', encoding='utf8') as input_:
             csv_reader = csv.reader(input_, delimiter=',')
-            # Skip header
-            next(csv_reader)
 
             for row in tqdm(csv_reader, desc='Iterating through csv file'):
-                (
-                    image_path,
-                    person_id,
-                    vk_id,
-                    city,
-                    age,
-                    sex,
-                    liveness_str,
-                    number_of_images_per_person_id_str,
-                    *__,
-                ) = row
+                person_id, *image_paths = row
 
-                if int(number_of_images_per_person_id_str) < args.threshold:
+                if len(image_paths) < args.threshold:
                     continue
 
-                sample = fo.Sample(filepath=str(args.dataset_file.parent / image_path))
-                sample['ground_truth'] = fo.Classification(label=person_id)
-                sample['city'] = city
-                sample['age'] = age
-                sample['sex'] = 'male' if sex == '2' else 'female'
-                sample['vk_id'] = vk_id
-                sample['liveness'] = float(liveness_str)
+                vk_id, city, age, sex, __ = person_id.split('_')
 
-                samples.append(sample)
+                for image_path in image_paths:
+                    path = args.dataset_file.parent / image_path
+                    sample = fo.Sample(path.as_posix())
+                    sample['ground_truth'] = fo.Classification(label=person_id)
+                    sample['city'] = city
+                    sample['age'] = age
+                    sample['sex'] = 'male' if sex == '2' else 'female'
+                    sample['vk_id'] = vk_id
+
+                    samples.append(sample)
 
     dataset = fo.Dataset(args.dataset_name)
     dataset.add_samples(samples)
