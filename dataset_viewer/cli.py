@@ -53,26 +53,27 @@ def main() -> int:
                 samples.append(sample)
     else:
         with open(args.dataset_file, 'r', newline='', encoding='utf8') as input_:
-            csv_reader = csv.reader(input_, delimiter=',')
+            csv_dictreader = csv.DictReader(input_, delimiter=',')
 
-            for row in tqdm(csv_reader, desc='Iterating through csv file'):
-                person_id, *image_paths = row
-
-                if len(image_paths) < args.threshold:
+            for dict_row in tqdm(csv_dictreader, desc='Iterating through csv file'):
+                if int(dict_row.get('number_of_images_per_person_id', 0)) < args.threshold:
                     continue
 
-                vk_id, city, age, sex, __ = person_id.split('_')
+                sex = None
+                sex_str = dict_row.get('sex', None)
+                if sex_str is not None:
+                    sex = 'male' if sex_str == '2' else 'female'
 
-                for image_path in image_paths:
-                    path = args.dataset_file.parent / image_path
-                    sample = fo.Sample(path.as_posix())
-                    sample['ground_truth'] = fo.Classification(label=person_id)
-                    sample['city'] = city
-                    sample['age'] = age
-                    sample['sex'] = 'male' if sex == '2' else 'female'
-                    sample['vk_id'] = vk_id
+                path = args.dataset_file.parent / dict_row.get('image_path', 'nan')
+                sample = fo.Sample(path.as_posix())
+                sample['ground_truth'] = fo.Classification(label=dict_row.get('person_id', 'nan'))
+                sample['city'] = dict_row.get('city', 'nan')
+                sample['age'] = dict_row.get('age', 'nan')
+                sample['sex'] = sex or 'nan'
+                sample['vk_id'] = dict_row.get('vk_id', 'nan')
+                sample['trashness'] = float(dict_row.get('trashness', 'nan'))
 
-                    samples.append(sample)
+                samples.append(sample)
 
     dataset = fo.Dataset(args.dataset_name)
     dataset.add_samples(samples)
